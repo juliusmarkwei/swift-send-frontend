@@ -48,7 +48,7 @@ const Login = () => {
                 Cookies.set("access_token", data.access);
                 Cookies.set("refresh_token", data.refresh);
                 toast.success("Login successful", { duration: 5000 });
-                route.push("/");
+                route.push("/dashboard");
                 setLoading(false);
             } else {
                 const data = await response.json();
@@ -95,15 +95,16 @@ const Login = () => {
                         disabled={disableBtn() || isLoading}
                         onClick={handleLogin}
                         type="submit"
-                        className="signInButton-Loginpage"
+                        className={`signInButton-Loginpage ${
+                            isLoading
+                                ? "hover:cursor-not-allowed bg-[#e2ae65]"
+                                : ""
+                        }`}
                     >
                         {isLoading ? (
-                            <TailSpin
-                                color="white"
-                                width={50}
-                                radius={5}
-                                height={40}
-                            />
+                            <div className="flex items-center justify-center">
+                                <span className="loading loading-spinner loading-md"></span>
+                            </div>
                         ) : (
                             "SIGN IN"
                         )}
