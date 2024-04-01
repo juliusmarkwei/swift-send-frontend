@@ -1,19 +1,41 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ReactNode } from "react";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import toast from "react-hot-toast";
+import { usePathname } from "next/navigation";
 
 interface LayoutProps {
     children: ReactNode;
 }
 
-const Layout = async ({ children }: LayoutProps) => {
+const Layout = ({ children }: LayoutProps) => {
+    const router = useRouter();
+
+    const handleLogout = () => {
+        Cookies.remove("access_token");
+        Cookies.remove("refresh_token");
+        toast.success("Logout successful", { duration: 5000 });
+        router.push("/login");
+    };
+
+    const pathName = usePathname();
+    const _dashboard = /^\/dashboard$/.test(pathName);
+    const _contact = pathName.includes("contact");
+    const _sms = /^\/dashboard\/sms$/.test(pathName);
+    const _sms_logs = pathName.includes("sms-logs");
+    const _templates = pathName.includes("templates");
+
     return (
         <div className="w-full flex h-screen">
             <div className="md:hidden">
                 {/* <MobileChatLayout friends={friends} session={session} sidebarOptions={sidebarOptions} unseenRequestCount={unseenRequestCount} /> */}
             </div>
-            <div className="hidden md:flex h-full w-full max-w-72 grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6 mr-8">
+            <div className="hidden md:flex h-full w-full max-w-72 grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
                 <Link
                     href="/dashboard"
                     className="flex h-16 shrink-0 items-center"
@@ -32,38 +54,56 @@ const Layout = async ({ children }: LayoutProps) => {
                             </div>
 
                             <ul role="list" className="-mx-2 mt-2 space-y-1">
-                                <li>
-                                    <Link
-                                        href="/dashboard"
-                                        className="group-hover:border-indigo-600 group-hover:text-indigo-600 flex items-center gap-x-2 px-2 py-2 rounded-md text-sm font-semibold leading-6 text-gray-900 "
-                                    >
-                                        Dashboard
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        href="/dashboard/contact"
-                                        className="flex items-center gap-x-2 px-2 py-2 rounded-md text-sm font-semibold leading-6 text-gray-900 "
-                                    >
-                                        Contacts
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        href="/dashboard/sms"
-                                        className="flex items-center gap-x-2 px-2 py-2 rounded-md text-sm font-semibold leading-6 text-gray-900 "
-                                    >
-                                        SMS
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link
-                                        href="/dashboard/templates"
-                                        className="flex items-center gap-x-2 px-2 py-2 rounded-md text-sm font-semibold leading-6 text-gray-900 "
-                                    >
-                                        Templates
-                                    </Link>
-                                </li>
+                                <Link
+                                    href="/dashboard"
+                                    className={`${
+                                        _dashboard
+                                            ? "bg-orange-500 p-3 text-white"
+                                            : ""
+                                    }  flex items-center gap-x-2 px-2 py-2 rounded-md text-sm font-semibold leading-6 text-gray-900`}
+                                >
+                                    Dashboard
+                                </Link>
+                                <Link
+                                    href="/dashboard/contact"
+                                    className={`${
+                                        _contact
+                                            ? "bg-orange-500 p-3 text-white"
+                                            : ""
+                                    } flex items-center gap-x-2 px-2 py-2 rounded-md text-sm font-semibold leading-6 text-gray-900`}
+                                >
+                                    Contacts
+                                </Link>
+                                <Link
+                                    href="/dashboard/sms"
+                                    className={`${
+                                        _sms
+                                            ? "bg-orange-500 p-3 text-white"
+                                            : ""
+                                    } flex items-center gap-x-2 px-2 py-2 rounded-md text-sm font-semibold leading-6 text-gray-900`}
+                                >
+                                    SMS
+                                </Link>
+                                <Link
+                                    href="/dashboard/sms-logs"
+                                    className={`${
+                                        _sms_logs
+                                            ? "bg-orange-500 p-3 text-white"
+                                            : ""
+                                    } flex items-center gap-x-2 px-2 py-2 rounded-md text-sm font-semibold leading-6 text-gray-900`}
+                                >
+                                    SMS Logs
+                                </Link>
+                                <Link
+                                    href="/dashboard/templates"
+                                    className={`${
+                                        _templates
+                                            ? "bg-orange-500 p-3 text-white"
+                                            : ""
+                                    } flex items-center gap-x-2 px-2 py-2 rounded-md text-sm font-semibold leading-6 text-gray-900`}
+                                >
+                                    Templates
+                                </Link>
                             </ul>
                         </li>
 
@@ -91,21 +131,22 @@ const Layout = async ({ children }: LayoutProps) => {
                                     </span>
                                 </div>
                             </div>
-
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={1.5}
-                                stroke="currentColor"
-                                className="w-6 h-6 hover:cursor-pointer mr-3"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"
-                                />
-                            </svg>
+                            <button onClick={handleLogout}>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={1.5}
+                                    stroke="currentColor"
+                                    className="w-6 h-6 hover:cursor-pointer mr-3"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"
+                                    />
+                                </svg>
+                            </button>
                         </li>
                     </ul>
                 </nav>
