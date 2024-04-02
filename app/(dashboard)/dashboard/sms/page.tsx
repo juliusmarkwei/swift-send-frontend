@@ -8,6 +8,7 @@ interface PageProps {}
 
 const Page: FC<PageProps> = () => {
     const [isLoading, setLoading] = useState(false);
+    const [_isLoading, _setLoading] = useState(false);
     const [contacts, setContacts] = useState<any>([]);
     const [messageLogs, setMessageLogs] = useState<any>();
     const [editMessageLogs, setEditMessageLogs] = useState<any>({
@@ -99,7 +100,7 @@ const Page: FC<PageProps> = () => {
     };
 
     const handleSubmit = async () => {
-        setLoading(true);
+        _setLoading(true);
         try {
             const response = await fetch(`${baseURL}/api/send-message`, {
                 method: "POST",
@@ -116,15 +117,15 @@ const Page: FC<PageProps> = () => {
                 toast.success("Message sent!", { duration: 5000 });
                 setMessage("");
                 setChosenContacts([]);
-                setLoading(false);
+                _setLoading(false);
             } else {
                 const data = await response.json();
                 toast.error(data.detail, { duration: 5000 });
-                setLoading(false);
+                _setLoading(false);
             }
         } catch (error) {
             console.log(error);
-            setLoading(false);
+            _setLoading(false);
         }
     };
 
@@ -274,7 +275,13 @@ const Page: FC<PageProps> = () => {
                                     onClick={handleSubmit}
                                     className="btn bg-orange-500 w-full text-white"
                                 >
-                                    Sumbit
+                                    {_isLoading ? (
+                                        <div className="flex items-center justify-center">
+                                            <span className="loading loading-spinner loading-md"></span>
+                                        </div>
+                                    ) : (
+                                        "Sumbit"
+                                    )}
                                 </button>
                             </div>
 

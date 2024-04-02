@@ -8,11 +8,15 @@ interface PaegeProps {}
 
 const Page = () => {
     const [isLoading, setLoading] = useState(false);
+    const [_isLoading, _setLoading] = useState(false);
     const [messageLogs, setMessageLogs] = useState<any>();
     const [editMessageLogs, setEditMessageLogs] = useState<any>({
         message: "",
         messageLogId: null,
     });
+
+    const [messageLogDetail, setMessageLogDetail] = useState<any>();
+    console.log(messageLogDetail && messageLogDetail.recipients);
 
     const baseURL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
     const accessToken = Cookies.get("access_token");
@@ -20,6 +24,44 @@ const Page = () => {
     useEffect(() => {
         getMessageLogs();
     }, []);
+
+    const handleDisplayRecipientModal = (messageLogId: any) => {
+        const modal = document.getElementById(
+            "my_modal_5_contact"
+        ) as HTMLDialogElement;
+        if (modal) {
+            modal.showModal();
+        }
+        getMessageLogDetail(messageLogId);
+    };
+
+    const getMessageLogDetail = async (messageLogId: any) => {
+        try {
+            _setLoading(true);
+            const response = await fetch(
+                `${baseURL}/api/message-logs/${messageLogId}`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `JWT ${accessToken}`,
+                    },
+                }
+            );
+            if (response.ok) {
+                const data = await response.json();
+                setMessageLogDetail(data);
+                _setLoading(false);
+            } else {
+                const data = await response.json();
+                toast.error("An error occured", { duration: 5000 });
+                _setLoading(false);
+            }
+        } catch (error) {
+            console.log(error);
+            _setLoading(false);
+        }
+    };
 
     const handleOnChange = (e: any) => {
         setEditMessageLogs((prev: any) => ({
@@ -147,7 +189,14 @@ const Page = () => {
                                 ? messageLogs.map(
                                       (messageLog: any, index: number) => {
                                           return (
-                                              <tr>
+                                              <tr
+                                                  className="hover:cursor-pointer"
+                                                  onClick={() =>
+                                                      handleDisplayRecipientModal(
+                                                          messageLog.id
+                                                      )
+                                                  }
+                                              >
                                                   <th>{index + 1}</th>
                                                   <td>{messageLog.content}</td>
                                                   <td>
@@ -198,61 +247,143 @@ const Page = () => {
                         </tbody>
                     </table>
                 </div>
-                <dialog
-                    id="my_modal_5"
-                    className="modal modal-bottom sm:modal-middle"
-                >
-                    <div className="modal-box">
-                        <div className="py-4">
-                            <div className="flex flex-col gap-6">
-                                <label className="input input-bordered flex items-center gap-2">
-                                    <svg
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        fill="none"
-                                        viewBox="0 0 24 24"
-                                        stroke-width="1.5"
-                                        stroke="currentColor"
-                                        className="w-6 h-6"
-                                    >
-                                        <path
-                                            stroke-linecap="round"
-                                            stroke-linejoin="round"
-                                            d="M21.75 9v.906a2.25 2.25 0 0 1-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 0 0 1.183 1.981l6.478 3.488m8.839 2.51-4.66-2.51m0 0-1.023-.55a2.25 2.25 0 0 0-2.134 0l-1.022.55m0 0-4.661 2.51m16.5 1.615a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V8.844a2.25 2.25 0 0 1 1.183-1.981l7.5-4.039a2.25 2.25 0 0 1 2.134 0l7.5 4.039a2.25 2.25 0 0 1 1.183 1.98V19.5Z"
+                <div>
+                    <dialog
+                        id="my_modal_5"
+                        className="modal modal-bottom sm:modal-middle"
+                    >
+                        <div className="modal-box">
+                            <div className="py-4">
+                                <div className="flex flex-col gap-6">
+                                    <label className="input input-bordered flex items-center gap-2">
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke-width="1.5"
+                                            stroke="currentColor"
+                                            className="w-6 h-6"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                d="M21.75 9v.906a2.25 2.25 0 0 1-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 0 0 1.183 1.981l6.478 3.488m8.839 2.51-4.66-2.51m0 0-1.023-.55a2.25 2.25 0 0 0-2.134 0l-1.022.55m0 0-4.661 2.51m16.5 1.615a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V8.844a2.25 2.25 0 0 1 1.183-1.981l7.5-4.039a2.25 2.25 0 0 1 2.134 0l7.5 4.039a2.25 2.25 0 0 1 1.183 1.98V19.5Z"
+                                            />
+                                        </svg>
+
+                                        <input
+                                            type="text"
+                                            className="grow"
+                                            placeholder="Full Name"
+                                            name="fullName"
+                                            value={editMessageLogs.message}
+                                            onChange={handleOnChange}
                                         />
-                                    </svg>
+                                    </label>
 
-                                    <input
-                                        type="text"
-                                        className="grow"
-                                        placeholder="Full Name"
-                                        name="fullName"
-                                        value={editMessageLogs.message}
-                                        onChange={handleOnChange}
-                                    />
-                                </label>
-
-                                <button
-                                    disabled={isLoading}
-                                    onClick={() =>
-                                        handleEdit(
-                                            editMessageLogs.message,
-                                            editMessageLogs.messageLogId
-                                        )
-                                    }
-                                    className="btn btn-primary"
-                                >
-                                    Send
-                                </button>
+                                    <button
+                                        disabled={isLoading}
+                                        onClick={() =>
+                                            handleEdit(
+                                                editMessageLogs.message,
+                                                editMessageLogs.messageLogId
+                                            )
+                                        }
+                                        className="btn btn-primary"
+                                    >
+                                        Send
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="modal-action">
+                                <form method="dialog">
+                                    {/* if there is a button in form, it will close the modal */}
+                                    <button className="btn">Close</button>
+                                </form>
                             </div>
                         </div>
-                        <div className="modal-action">
-                            <form method="dialog">
-                                {/* if there is a button in form, it will close the modal */}
-                                <button className="btn">Close</button>
-                            </form>
+                    </dialog>
+                    <dialog
+                        id="my_modal_5_contact"
+                        className="modal modal-bottom sm:modal-middle"
+                    >
+                        <div className="modal-box">
+                            <div className="py-4">
+                                <div className="flex flex-col gap-6">
+                                    <main>
+                                        <div className="overflow-x-auto">
+                                            <table className="table table-zebra">
+                                                {/* head */}
+                                                <thead>
+                                                    <tr>
+                                                        <th></th>
+                                                        <th>Full Name</th>
+                                                        <th>Status</th>
+                                                        <th>Phone</th>
+                                                    </tr>
+                                                </thead>
+
+                                                {messageLogDetail &&
+                                                    messageLogDetail.recipients.map(
+                                                        (
+                                                            recipients: any,
+                                                            index: number
+                                                        ) => {
+                                                            return (
+                                                                <tbody>
+                                                                    <tr>
+                                                                        {_isLoading ? (
+                                                                            <span className="flex justify-center items-center loading loading-spinner loading-md"></span>
+                                                                        ) : (
+                                                                            <>
+                                                                                <th>
+                                                                                    {index +
+                                                                                        1}
+                                                                                </th>
+                                                                                <td>
+                                                                                    {recipients.contact_info &&
+                                                                                    recipients.contact_info !=
+                                                                                        null
+                                                                                        ? recipients
+                                                                                              .contact_info
+                                                                                              .full_name
+                                                                                        : "Empty"}
+                                                                                </td>
+                                                                                <td>
+                                                                                    {
+                                                                                        recipients.status
+                                                                                    }
+                                                                                </td>
+                                                                                <td>
+                                                                                    {recipients.contact_info &&
+                                                                                    recipients.contact_info !=
+                                                                                        null
+                                                                                        ? recipients
+                                                                                              .contact_info
+                                                                                              .phone
+                                                                                        : "Empty"}
+                                                                                </td>
+                                                                            </>
+                                                                        )}
+                                                                    </tr>
+                                                                </tbody>
+                                                            );
+                                                        }
+                                                    )}
+                                            </table>
+                                        </div>
+                                    </main>
+                                </div>
+                            </div>
+                            <div className="modal-action">
+                                <form method="dialog">
+                                    {/* if there is a button in form, it will close the modal */}
+                                    <button className="btn">Close</button>
+                                </form>
+                            </div>
                         </div>
-                    </div>
-                </dialog>
+                    </dialog>
+                </div>
             </div>
         </div>
     );

@@ -8,6 +8,7 @@ interface ContactProps {}
 
 const Page: FC<ContactProps> = () => {
     const [isLoading, setLoading] = useState(false);
+    const [_isLoading, _setLoading] = useState(false);
     const [contacts, setContacts] = useState<any>([]);
 
     const [formData, setFormData] = useState({
@@ -70,7 +71,7 @@ const Page: FC<ContactProps> = () => {
         e.preventDefault();
         const interPhone = `+233${formData.mobile.slice(1)}`;
         try {
-            setLoading(true);
+            _setLoading(true);
             const response = await fetch(`${baseURL}/api/contacts`, {
                 method: "POST",
                 headers: {
@@ -95,15 +96,15 @@ const Page: FC<ContactProps> = () => {
                     info: "",
                 });
                 toast.success("Contact saved successfully", { duration: 5000 });
-                setLoading(false);
+                _setLoading(false);
             } else {
                 const data = await response.json();
                 toast.error(data.detail, { duration: 5000 });
-                setLoading(false);
+                _setLoading(false);
             }
         } catch (error) {
             console.log(error);
-            setLoading(false);
+            _setLoading(false);
         }
     };
 
@@ -304,11 +305,17 @@ const Page: FC<ContactProps> = () => {
                     </label>
 
                     <button
-                        disabled={disableBtn() || isLoading}
+                        disabled={disableBtn() || _isLoading}
                         onClick={handleSubmit}
                         className="btn bg-orange-500 text-white"
                     >
-                        Sumbit
+                        {_isLoading ? (
+                            <div className="flex items-center justify-center">
+                                <span className="loading loading-spinner loading-md"></span>
+                            </div>
+                        ) : (
+                            "Add"
+                        )}
                     </button>
                 </div>
 
