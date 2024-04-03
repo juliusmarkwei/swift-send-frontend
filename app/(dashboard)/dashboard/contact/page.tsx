@@ -9,9 +9,18 @@ interface ContactProps {}
 const Page: FC<ContactProps> = () => {
     const [isLoading, setLoading] = useState(false);
     const [_isLoading, _setLoading] = useState(false);
+    const [__isLoading, __setLoading] = useState(false);
     const [contacts, setContacts] = useState<any>([]);
+    const [editContactData, setEditContactData] = useState<any>();
 
     const [formData, setFormData] = useState({
+        fullName: "",
+        email: "",
+        mobile: "",
+        info: "",
+    });
+
+    const [contactInfo, setContactInfo] = useState<any>({
         fullName: "",
         email: "",
         mobile: "",
@@ -42,12 +51,15 @@ const Page: FC<ContactProps> = () => {
         );
     };
 
-    const [editContactData, setEditContactData] = useState<any>({
-        fullName: "",
-        mobile: "",
-        info: "",
-        email: "",
-    });
+    const handleDisplayContactInfotModal = (contactFullName: string) => {
+        const modal = document.getElementById(
+            "my_modal_5_contact"
+        ) as HTMLDialogElement;
+        if (modal) {
+            modal.showModal();
+        }
+        getContactInfo(contactFullName);
+    };
 
     const handleEditModal = (contact: any) => {
         const modal = document.getElementById(
@@ -66,6 +78,34 @@ const Page: FC<ContactProps> = () => {
 
     const baseURL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
     const accessToken = Cookies.get("access_token");
+
+    const getContactInfo = async (fullName: string) => {
+        __setLoading(true);
+        try {
+            const response = await fetch(
+                `${baseURL}/api/contacts/${fullName}`,
+                {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `JWT ${accessToken}`,
+                    },
+                }
+            );
+            if (response.ok) {
+                const data = await response.json();
+                setContactInfo(data);
+                __setLoading(false);
+            } else {
+                const data = await response.json();
+                toast.error(data.message, { duration: 5000 });
+                __setLoading(false);
+            }
+        } catch (error) {
+            console.log(error);
+            __setLoading(false);
+        }
+    };
 
     const handleSubmit = async (e: any) => {
         e.preventDefault();
@@ -314,7 +354,7 @@ const Page: FC<ContactProps> = () => {
                                 <span className="loading loading-spinner loading-md"></span>
                             </div>
                         ) : (
-                            "Add"
+                            "Create"
                         )}
                     </button>
                 </div>
@@ -341,7 +381,15 @@ const Page: FC<ContactProps> = () => {
                                         (contact: any, index: number) => {
                                             return (
                                                 <>
-                                                    <tr key={index}>
+                                                    <tr
+                                                        key={index}
+                                                        className="cursor-pointer"
+                                                        onClick={() =>
+                                                            handleDisplayContactInfotModal(
+                                                                contact.full_name
+                                                            )
+                                                        }
+                                                    >
                                                         <th>{index + 1}</th>
                                                         <td>
                                                             {contact.full_name}
@@ -514,6 +562,40 @@ const Page: FC<ContactProps> = () => {
                             >
                                 Save
                             </button>
+                        </div>
+                    </div>
+                    <div className="modal-action">
+                        <form method="dialog">
+                            {/* if there is a button in form, it will close the modal */}
+                            <button className="btn">Close</button>
+                        </form>
+                    </div>
+                </div>
+            </dialog>
+
+            <dialog
+                id="my_modal_5_contact_info"
+                className="modal modal-bottom sm:modal-middle"
+            >
+                <div className="modal-box">
+                    <div className="py-4">
+                        <div className="flex flex-col gap-6">
+                            <label className="input input-bordered flex items-center gap-2">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke-width="1.5"
+                                    stroke="currentColor"
+                                    className="w-6 h-6"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M21.75 9v.906a2.25 2.25 0 0 1-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 0 0 1.183 1.981l6.478 3.488m8.839 2.51-4.66-2.51m0 0-1.023-.55a2.25 2.25 0 0 0-2.134 0l-1.022.55m0 0-4.661 2.51m16.5 1.615a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V8.844a2.25 2.25 0 0 1 1.183-1.981l7.5-4.039a2.25 2.25 0 0 1 2.134 0l7.5 4.039a2.25 2.25 0 0 1 1.183 1.98V19.5Z"
+                                    />
+                                </svg>
+                            </label>
                         </div>
                     </div>
                     <div className="modal-action">

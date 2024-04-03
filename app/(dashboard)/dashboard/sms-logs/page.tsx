@@ -16,7 +16,6 @@ const Page = () => {
     });
 
     const [messageLogDetail, setMessageLogDetail] = useState<any>();
-    console.log(messageLogDetail && messageLogDetail.recipients);
 
     const baseURL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
     const accessToken = Cookies.get("access_token");
@@ -95,11 +94,11 @@ const Page = () => {
         }
     };
 
-    const handleResend = async (messageId: string) => {
+    const handleResend = async (messageId: number) => {
         setLoading(true);
         try {
             const response = await fetch(
-                `${baseURL}/message-logs/${messageId}/resend`,
+                `${baseURL}/api/message-logs/${messageId}/resend`,
                 {
                     method: "POST",
                     headers: {
@@ -109,7 +108,8 @@ const Page = () => {
                 }
             );
             if (response.ok) {
-                toast.success("Message send!", { duration: 5000 });
+                toast.success("Message sent! 😊", { duration: 5000 });
+                getMessageLogs();
                 setLoading(false);
             } else {
                 const data = await response.json();
@@ -122,13 +122,11 @@ const Page = () => {
         }
     };
 
-    const handleEdit = async (editedMessageLog: string, messageId: string) => {
-        console.log(editMessageLogs, messageId);
-
+    const handleEdit = async (editedMessageLog: string, messageId: number) => {
         try {
             setLoading(true);
             const response = await fetch(
-                `${baseURL}/message-logs/${messageId}/edit-resend`,
+                `${baseURL}/api/message-logs/${messageId}/edit-resend`,
                 {
                     method: "POST",
                     headers: {
@@ -136,17 +134,17 @@ const Page = () => {
                         Authorization: `JWT ${accessToken}`,
                     },
                     body: JSON.stringify({
-                        message: editedMessageLog,
+                        content: editedMessageLog,
                     }),
                 }
             );
             if (response.ok) {
-                toast.success("Message sent!", { duration: 5000 });
+                toast.success("Message resent! ↩️", { duration: 5000 });
                 getMessageLogs();
                 setLoading(false);
             } else {
                 const data = await response.json();
-                toast.error(data.detail, { duration: 5000 });
+                toast.error(data.message, { duration: 5000 });
                 setLoading(false);
             }
         } catch (error) {
@@ -155,7 +153,7 @@ const Page = () => {
         }
     };
 
-    const handleEditModal = (messageLogContent: any, index: any) => {
+    const handleEditModal = (messageLogContent: any, index: number) => {
         const modal = document.getElementById(
             "my_modal_5"
         ) as HTMLDialogElement;
@@ -209,7 +207,7 @@ const Page = () => {
                                                           onClick={() => {
                                                               handleEditModal(
                                                                   messageLog.content,
-                                                                  index + 1
+                                                                  messageLog.id
                                                               );
                                                           }}
                                                           xmlns="http://www.w3.org/2000/svg"
@@ -229,9 +227,7 @@ const Page = () => {
                                                       <img
                                                           onClick={() =>
                                                               handleResend(
-                                                                  JSON.stringify(
-                                                                      index + 1
-                                                                  )
+                                                                  messageLog.id
                                                               )
                                                           }
                                                           className="w-9 h-9 hover:cursor-pointer"

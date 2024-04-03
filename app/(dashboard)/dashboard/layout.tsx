@@ -2,18 +2,26 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ReactNode } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { usePathname } from "next/navigation";
+import SwiftSendLogo from "@/public/SwiftSend with env.png";
 
 interface LayoutProps {
     children: ReactNode;
 }
 
+const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
+
 const Layout = ({ children }: LayoutProps) => {
     const router = useRouter();
+    const [userData, setUserData] = useState<any>();
+
+    useEffect(() => {
+        getUserData();
+    }, []);
 
     const handleLogout = () => {
         Cookies.remove("access_token");
@@ -29,6 +37,21 @@ const Layout = ({ children }: LayoutProps) => {
     const _sms_logs = pathName.includes("sms-logs");
     const _templates = pathName.includes("templates");
 
+    const accessToken = Cookies.get("access_token");
+
+    const getUserData = async () => {
+        const response = await fetch(`${baseUrl}/auth/users/me/`, {
+            method: "GET",
+            headers: {
+                Authorization: `JWT ${accessToken}`,
+            },
+        });
+        if (response.ok) {
+            const data = await response.json();
+            setUserData(data);
+        }
+    };
+
     return (
         <div className="w-full flex h-screen">
             <div className="md:hidden">
@@ -37,9 +60,9 @@ const Layout = ({ children }: LayoutProps) => {
             <div className="hidden md:flex h-full w-full max-w-72 grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-6">
                 <Link
                     href="/dashboard"
-                    className="flex h-16 shrink-0 items-center"
+                    className="flex h-16 shrink-0 items-center justify-center w-full pt-8"
                 >
-                    Logo
+                    <img src={SwiftSendLogo.src} alt="" />
                 </Link>
 
                 <nav className="flex flex-1 flex-col">
@@ -121,12 +144,14 @@ const Layout = ({ children }: LayoutProps) => {
                                 <span className="sr-only">Your profile</span>
 
                                 <div className="flex flex-col">
-                                    <span arial-hidden="true">Gustavo</span>
+                                    <span arial-hidden="true">
+                                        {userData && userData.full_name}
+                                    </span>
                                     <span
                                         className="text-sx text-zinc-400 w-32 overflow-ellipsis truncate"
                                         arial-hidden="true"
                                     >
-                                        iamnetwork23@gmail.com
+                                        {userData && userData.email}
                                     </span>
                                 </div>
                             </div>
