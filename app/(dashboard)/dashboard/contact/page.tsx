@@ -458,7 +458,7 @@ const Page: FC<ContactProps> = () => {
             >
                 <div className="modal-box">
                     <h3 className="font-bold text-lg">
-                        {editContactData && editContactData.full_name}
+                        {editContactData && editContactData.fullName}
                     </h3>
                     <div className="py-4">
                         <div className="flex flex-col gap-6">
@@ -476,7 +476,7 @@ const Page: FC<ContactProps> = () => {
                                     className="grow"
                                     placeholder="Full Name"
                                     name="fullName"
-                                    value={editContactData.fullName}
+                                    value={editContactData?.fullName}
                                     onChange={_handleOnChange}
                                 />
                             </label>
@@ -496,7 +496,7 @@ const Page: FC<ContactProps> = () => {
                                     className="grow"
                                     placeholder="Email"
                                     name="email"
-                                    value={editContactData.email}
+                                    value={editContactData?.email}
                                     onChange={_handleOnChange}
                                 />
                             </label>
@@ -522,7 +522,7 @@ const Page: FC<ContactProps> = () => {
                                     className="grow"
                                     placeholder="Mobile Number"
                                     name="mobile"
-                                    value={editContactData.mobile}
+                                    value={editContactData?.mobile}
                                     onChange={_handleOnChange}
                                 />
                             </label>
@@ -548,7 +548,7 @@ const Page: FC<ContactProps> = () => {
                                     className="grow"
                                     placeholder="Info"
                                     name="info"
-                                    value={editContactData.info}
+                                    value={editContactData?.info}
                                     onChange={_handleOnChange}
                                 />
                             </label>
