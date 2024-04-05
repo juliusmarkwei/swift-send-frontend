@@ -4,7 +4,10 @@ import { FC, useState, useEffect } from "react";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 
-interface PaegeProps {}
+interface PageProps {}
+
+const baseURL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
+const accessToken = Cookies.get("access_token");
 
 const Page = () => {
     const [isLoading, setLoading] = useState(false);
@@ -16,9 +19,6 @@ const Page = () => {
     });
 
     const [messageLogDetail, setMessageLogDetail] = useState<any>();
-
-    const baseURL = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
-    const accessToken = Cookies.get("access_token");
 
     useEffect(() => {
         getMessageLogs();
