@@ -200,7 +200,7 @@ const Page = () => {
                                                   <td>
                                                       {new Date(
                                                           messageLog.sent_at
-                                                      ).toLocaleDateString()}
+                                                      ).toLocaleString()}
                                                   </td>
                                                   <td className="flex items-start gap-4 hover:cursor-pointer">
                                                       <svg

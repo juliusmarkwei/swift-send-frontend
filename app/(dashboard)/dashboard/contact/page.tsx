@@ -370,7 +370,7 @@ const Page: FC<ContactProps> = () => {
 
                 <div className="w-full">
                     <div className="overflow-x-auto">
-                        <table className="table">
+                        <table className="table table-zebra">
                             {/* head */}
                             <thead>
                                 <tr>
@@ -392,7 +392,7 @@ const Page: FC<ContactProps> = () => {
                                                 <>
                                                     <tr
                                                         key={index}
-                                                        className="cursor-pointer hover:bg-orange-200"
+                                                        className="cursor-pointer"
                                                         onClick={() =>
                                                             handleDisplayContactInfotModal(
                                                                 contact.full_name
