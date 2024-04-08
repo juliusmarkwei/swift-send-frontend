@@ -18,10 +18,10 @@ const baseUrl = process.env.NEXT_PUBLIC_BACKEND_BASE_URL;
 
 const Layout = ({ children }: LayoutProps) => {
     const router = useRouter();
-    const [userData, setUserData] = useState<any>();
 
     useEffect(() => {
-        getUserData();
+        const checkuserdata = Cookies.get("_se7_wer_") as string;
+        if (!checkuserdata) getUserData();
     }, []);
 
     const handleLogout = () => {
@@ -48,8 +48,10 @@ const Layout = ({ children }: LayoutProps) => {
             },
         });
         if (response.ok) {
+            Cookies.set("_se7_wer_", "true");
             const data = await response.json();
-            setUserData(data);
+            localStorage.setItem("ag63_#6y0", JSON.stringify(data.full_name));
+            localStorage.setItem("bty3_35=", JSON.stringify(data.email));
         }
     };
 
@@ -135,10 +137,7 @@ const Layout = ({ children }: LayoutProps) => {
                             </ul>
                         </li>
 
-                        <Logout
-                            userData={userData}
-                            handleLogout={handleLogout}
-                        />
+                        <Logout handleLogout={handleLogout} />
                     </ul>
                 </nav>
             </div>

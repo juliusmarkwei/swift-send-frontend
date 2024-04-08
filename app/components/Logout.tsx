@@ -1,13 +1,11 @@
 import React from "react";
 import Image from "next/image";
 
-const Logout = ({
-    userData,
-    handleLogout,
-}: {
-    userData: any;
+interface LogoutProps {
     handleLogout: any;
-}) => {
+}
+
+const Logout = ({ handleLogout }: LogoutProps) => {
     return (
         <li className="-mx-6 mt-auto flex items-center">
             <div className="flex flex-1 items-center gap-x-4 px-6 py-3 text-sm font-semibold leading-6 text-gray-900">
@@ -25,13 +23,13 @@ const Logout = ({
 
                 <div className="flex flex-col">
                     <span arial-hidden="true">
-                        {userData && userData.full_name}
+                        {localStorage.getItem("ag63_#6y0")}
                     </span>
                     <span
                         className="text-sx text-zinc-400 w-32 overflow-ellipsis truncate"
                         arial-hidden="true"
                     >
-                        {userData && userData.email}
+                        {localStorage.getItem("bty3_35=")}
                     </span>
                 </div>
             </div>
