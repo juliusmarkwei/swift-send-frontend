@@ -62,7 +62,12 @@ const Layout = ({ children }: LayoutProps) => {
                     href="/dashboard"
                     className="flex h-16 shrink-0 items-center justify-center w-full pt-8"
                 >
-                    <img src={SwiftSendLogo.src} alt="" />
+                    <Image
+                        src={SwiftSendLogo.src}
+                        alt="logo"
+                        width={250}
+                        height={250}
+                    />
                 </Link>
 
                 <nav className="flex flex-1 flex-col">

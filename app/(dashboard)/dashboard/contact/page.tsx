@@ -3,6 +3,7 @@
 import { FC, useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import Cookies from "js-cookie";
+import { Fascinate } from "next/font/google";
 
 interface ContactProps {}
 
@@ -20,12 +21,7 @@ const Page: FC<ContactProps> = () => {
         info: "",
     });
 
-    const [contactInfo, setContactInfo] = useState<any>({
-        fullName: "",
-        email: "",
-        mobile: "",
-        info: "",
-    });
+    const [contactInfo, setContactInfo] = useState<any>();
     // const [contactData, setContactData] = useState<any>();
 
     const handleOnChange = (e: any) => {
@@ -50,10 +46,18 @@ const Page: FC<ContactProps> = () => {
             formData.info === ""
         );
     };
+    const _disableBtn = () => {
+        return (
+            editContactData?.fullName === "" ||
+            editContactData?.email === "" ||
+            editContactData?.mobile === "" ||
+            editContactData?.info === ""
+        );
+    };
 
     const handleDisplayContactInfotModal = (contactFullName: string) => {
         const modal = document.getElementById(
-            "my_modal_5_contact"
+            "my_modal_5_contact_info"
         ) as HTMLDialogElement;
         if (modal) {
             modal.showModal();
@@ -81,6 +85,7 @@ const Page: FC<ContactProps> = () => {
 
     const getContactInfo = async (fullName: string) => {
         __setLoading(true);
+        setContactInfo(null);
         try {
             const response = await fetch(
                 `${baseURL}/api/contacts/${fullName}`,
@@ -216,6 +221,7 @@ const Page: FC<ContactProps> = () => {
 
     const handleEdit = async (e: any, fullName: string) => {
         e.preventDefault();
+        setLoading(true);
         try {
             const response = await fetch(
                 `${baseURL}/api/contacts/${fullName}`,
@@ -238,12 +244,15 @@ const Page: FC<ContactProps> = () => {
                 toast.success("Contact updated successfully", {
                     duration: 5000,
                 });
+                setLoading(false);
             } else {
                 const data = await response.json();
                 toast.error(data.detail, { duration: 5000 });
+                setLoading(false);
             }
         } catch (error) {
             console.log(error);
+            setLoading(false);
         }
     };
 
@@ -361,7 +370,7 @@ const Page: FC<ContactProps> = () => {
 
                 <div className="w-full">
                     <div className="overflow-x-auto">
-                        <table className="table table-zebra">
+                        <table className="table">
                             {/* head */}
                             <thead>
                                 <tr>
@@ -374,7 +383,7 @@ const Page: FC<ContactProps> = () => {
 
                             <tbody>
                                 {isLoading ? (
-                                    <span className="loading loading-bars loading-lg mx-auto my-24"></span>
+                                    <span className="loading loading-dots loading-lg"></span>
                                 ) : (
                                     contacts &&
                                     contacts.map(
@@ -383,7 +392,7 @@ const Page: FC<ContactProps> = () => {
                                                 <>
                                                     <tr
                                                         key={index}
-                                                        className="cursor-pointer"
+                                                        className="cursor-pointer hover:bg-orange-200"
                                                         onClick={() =>
                                                             handleDisplayContactInfotModal(
                                                                 contact.full_name
@@ -554,13 +563,17 @@ const Page: FC<ContactProps> = () => {
                             </label>
 
                             <button
-                                // disabled={disableBtn() || isLoading}
+                                disabled={_disableBtn() || isLoading}
                                 onClick={(e) =>
                                     handleEdit(e, editContactData.fullName)
                                 }
-                                className="btn btn-primary"
+                                className="btn bg-orange-500 text-white"
                             >
-                                Save
+                                {isLoading ? (
+                                    <span className="loading loading-spinner loading-md"></span>
+                                ) : (
+                                    "Save"
+                                )}
                             </button>
                         </div>
                     </div>
@@ -580,21 +593,34 @@ const Page: FC<ContactProps> = () => {
                 <div className="modal-box">
                     <div className="py-4">
                         <div className="flex flex-col gap-6">
-                            <label className="input input-bordered flex items-center gap-2">
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke-width="1.5"
-                                    stroke="currentColor"
-                                    className="w-6 h-6"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        d="M21.75 9v.906a2.25 2.25 0 0 1-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 0 0 1.183 1.981l6.478 3.488m8.839 2.51-4.66-2.51m0 0-1.023-.55a2.25 2.25 0 0 0-2.134 0l-1.022.55m0 0-4.661 2.51m16.5 1.615a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V8.844a2.25 2.25 0 0 1 1.183-1.981l7.5-4.039a2.25 2.25 0 0 1 2.134 0l7.5 4.039a2.25 2.25 0 0 1 1.183 1.98V19.5Z"
-                                    />
-                                </svg>
+                            <label className="flex items-center gap-2">
+                                <div className="overflow-x-auto">
+                                    <h3 className="w-full text-center">
+                                        Contact Information
+                                    </h3>
+                                    <table className="table">
+                                        <tbody>
+                                            <tr>
+                                                <th>Full Name</th>
+                                                <td>
+                                                    {contactInfo?.full_name}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th>Email</th>
+                                                <td>{contactInfo?.email}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Phone</th>
+                                                <td>{contactInfo?.phone}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Info</th>
+                                                <td>{contactInfo?.info}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </label>
                         </div>
                     </div>
